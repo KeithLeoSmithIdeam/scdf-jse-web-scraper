@@ -8,19 +8,6 @@ Spring Cloud Task Application Starters are Spring Boot applications that may be 
 3) Guide to create custom apps - [here](https://docs.spring.io/spring-cloud-task-app-starters/docs/Elston.SR1/reference/htmlsingle/)
 4) Guide on deployment - [here](https://docs.spring.io/spring-cloud-dataflow-server-kubernetes/docs/current-SNAPSHOT/reference/htmlsingle/#_deploying_tasks)
 
-## Links to use
-1) [Web scraper using JSoup and Spring Boot](https://www.thetechnojournals.com/2019/11/web-scraper-using-jsoup-and-spring-boot.html)
-2) [Udemy Course](https://www.udemy.com/course/learn-web-scraping-with-java-in-just-1-hour/)
-3) [Jsoup artcilce Baeldung](https://www.baeldung.com/java-with-jsoup)
-4) [Spring Cloud Dataflow Docs](https://dataflow.spring.io/docs/batch-developer-guides/getting-started/)
-
-## Custom Apps
-1) using core - [here](https://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/index.html#_getting_started)
-
-## Build the docker image with jib
-```bash
-mvn compile jib:dockerBuild
-```
 
 ## Example Arguments
 ```bash
