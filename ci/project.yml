@@ -1,0 +1,9 @@
+#These are the project specififc environment variables
+
+variables:
+  PRJ_PROJECT_NAME: 'jse-web-scraper'
+  PRJ_PROJECT_PATH: 'scd/apps'
+  PRJ_DOCKER_FILE_LOCATION: Dockerfile
+  PRJ_JAR: jsescraper-0.0.1-SNAPSHOT.jar
+  #MAVEN_OPTS: '-Dmaven.repo.local=/.m2'
+

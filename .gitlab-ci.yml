@@ -1,0 +1,87 @@
+include:
+  - local: '/ci/project.yml'
+
+image: $CIRUNNER_BASE_CI_IMAGE
+
+# Cache downloaded dependencies and plugins between builds.
+# To keep cache across branches add 'key: "$CI_JOB_NAME"'
+#cache:
+#  paths:
+#    - .m2/repository
+
+stages:
+  - build
+  - version
+  - deploy_nexus
+  - deploy_docker
+
+maven-build:
+  when: on_success
+  only:
+    - master
+  tags: ["docker"]
+  #image: maven:3-jdk-8
+  stage: build
+  script: "mvn package -B -DskipTests"
+  artifacts:
+    paths:
+      - target/*.jar
+
+job_version:
+  when: on_success
+  only:
+    - master
+  tags: ["docker"]
+  stage: version
+  artifacts:
+    paths:
+      - version
+  before_script:
+    - chmod +x /config/scripts/version/version
+  script:
+    - echo ".........................................................................................................................."
+    - echo "Versioning the current code base with custom versioning script"
+    - /config/scripts/version/version > version
+    - export VERSION=$(cat ./version)
+    - echo "The Version is - $VERSION"
+    - echo ".........................................................................................................................."
+
+maven-deploy-nexus:
+  when: manual
+  only:
+    - master
+  tags: ["docker"]
+  stage: deploy_nexus
+  #script: "mvn deploy -DskipTests"
+  script: "COMMENTED OUT DEPLOY OF METADATA JAR"
+
+
+docker-build:
+  when: on_success
+  tags: ["docker"]
+  only:
+    - master
+  stage: deploy_docker
+  artifacts:
+    paths:
+      - image
+  before_script:
+    - echo ".........................................................................................................................."
+    - echo "Creating full docker image name with version and exporting as ENV variable and saving to build artifacts as file named 'image' "
+    - echo ".........................................................................................................................."
+    - export VERSION=$(cat ./version)
+    - echo "Version is $VERSION"
+    - export DEPLOY_IMAGE_NAME=${CIRUNNER_PRIVATE_REGISTRY_URL}/${PRJ_PROJECT_PATH}/${PRJ_PROJECT_NAME}:$VERSION
+    - echo DEPLOY_IMAGE_NAME is $DEPLOY_IMAGE_NAME
+    - echo $DEPLOY_IMAGE_NAME > image
+    - echo ".........................................................................................................................."
+    - echo "Logging in to private docker registry $CITOOL_PRIVATE_REGISTRY_URL"
+    - docker login -u $CIRUNNER_PRIVATE_REGISTRY_USER -p $CIRUNNER_PRIVATE_REGISTRY_PASSWORD $CIRUNNER_PRIVATE_REGISTRY_URL
+    - echo ".........................................................................................................................."
+  script:
+    - echo ".........................................................................................................................."
+    - echo "Building docker image"
+    - echo ".........................................................................................................................."
+    - docker build --build-arg JAR_FILE=target/$PRJ_JAR -t "$DEPLOY_IMAGE_NAME" .
+    - docker push "$DEPLOY_IMAGE_NAME"
+    - echo ".........................................................................................................................."
